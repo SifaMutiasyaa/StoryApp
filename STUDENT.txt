@@ -1,0 +1,2 @@
+APP_URL=https://funny-kitsune-7a7482.netlify.app/
+MAP_SERVICE_API_KEY=eXS78O77TseIxWlFdU3X

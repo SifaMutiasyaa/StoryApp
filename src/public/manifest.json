@@ -1,0 +1,52 @@
+{
+  "name": "Story App",
+  "short_name": "Story",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#6200ea",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/images/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+    "name": "add story",
+    "short_name": "add",
+    "description": "Langsung menuju halaman tambah cerita",
+    "url": "/#/add-story",
+      "icons": [
+        {
+          "src": "/images/plus.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/images/desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "platform": "desktop"
+    },
+    {
+      "src": "/images/mobile.png",
+      "sizes": "320x662",
+      "type": "image/png",
+      "platform": "mobile"
+    }
+  ]
+}

@@ -1,0 +1,227 @@
+#app {
+  min-height: 80vh;
+  padding: 1rem;
+  transition: all 0.3s ease;
+  will-change: opacity, transform;
+}
+
+:root {
+  --primary: #60B5FF;
+  --secondary: #AFDDFF;
+  --highlight: #FFFECB;
+  --accent: #FF9149;
+  --bg: linear-gradient(to bottom right, #e0f7ff, #ffffff);
+  --text-color: #333;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.3);
+  z-index: -1;
+}
+
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: url('https://png.pngtree.com/thumb_back/fh260/background/20231224/pngtree-fluid-light-blue-watercolor-background-hand-painted-abstract-sky-blue-texture-image_13859884.png') no-repeat center center fixed;
+  background-size: cover;
+  color: var(--text-color);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+
+main {
+  flex: 1;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+header {
+  background-color: var(--primary);
+  padding: 1rem 2rem;
+  box-shadow: var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.nav-logo {
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: #fff;
+  text-decoration: none;
+}
+
+.nav-links {
+  display: flex;
+  gap: 1.2rem;
+  list-style: none;
+}
+
+.nav-links a {
+  color: #fff;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.nav-links a:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+footer {
+  text-align: center;
+  padding: 1rem;
+  background-color: var(--secondary);
+  color: #333;
+  font-size: 0.9rem;
+}
+
+
+.text-center {
+  text-align: center;
+}
+
+.fade-in {
+  animation: fadeInUp 0.6s ease forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 400ms;
+  animation-timing-function: ease-in-out;
+}
+
+::view-transition-old(root) {
+  opacity: 1;
+  animation-name: fade-out;
+}
+
+::view-transition-new(root) {
+  opacity: 0;
+  animation-name: fade-in;
+}
+
+.scroll-top-btn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  border: none;
+  border-radius: 50%;
+  background-color: var(--primary);
+  color: white;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  z-index: 1000;
+  opacity: 0;
+  transform: translateY(100px);
+  transition: all 0.3s ease;
+}
+
+.scroll-top-btn:hover {
+  background-color: var(--accent);
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: var(--shadow-lg);
+}
+
+.scroll-top-btn.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Skip to Content Styles */
+.skip-to-content {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background-color: #60B5FF; /* atau gunakan var(--primary) jika sudah diatur */
+  color: #ffffff;
+  padding: 8px 16px;
+  z-index: 1000;
+  text-decoration: none;
+  font-weight: bold;
+  transition: top 0.3s ease;
+}
+
+.skip-to-content:focus {
+  top: 0;
+}
+
+
+@keyframes fade-in {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media screen and (max-width: 768px) {
+  header {
+    padding: 1rem;
+  }
+
+  .nav-logo {
+    font-size: 1.2rem;
+  }
+
+  .nav-links {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: flex-end;
+  }
+
+  .nav-links a {
+    font-size: 0.85rem;
+    padding: 0.3rem 0.5rem;
+  }
+
+  main {
+    padding: 1rem;
+  }
+
+}
