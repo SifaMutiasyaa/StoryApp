@@ -1,0 +1,21 @@
+<!doctype html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Dicoding Story App</title><link rel="manifest" href="manifest.json"/><link rel="icon" href="./public/images/logo.png"/><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"><link rel="stylesheet" href="styles/styles.css"/><script defer="defer" src="app.bundle.js"></script><link href="app.css" rel="stylesheet"></head><body><header><a href="#app" class="skip-to-content">Skip to main content</a><nav class="navbar"><a href="#/" class="nav-logo">📖 StoryApp</a><ul class="nav-links"><li><a href="#/">Home</a></li><li><a href="#/saved" class="nav-link">Saved</a> <a href="#/add-story" class="icon-btn" title="Add Story"><span class="plus-icon">➕</span></a></li><li><a href="#/about">About</a></li><li><a href="#/profile" id="profile-link">Profile</a></li></ul></nav></header><button id="scrollTopBtn" class="scroll-top-btn" aria-label="Scroll to top">🔝</button><main id="app" tabindex="0"></main><footer><p>&copy; 2025 Story App</p></footer><script>const skipLink = document.querySelector('.skip-to-content');
+    const mainContent = document.getElementById('app');
+
+    // Skip to content behavior
+    skipLink.addEventListener('click', function (e) {
+      e.preventDefault();
+      mainContent.focus();  
+    });
+
+    const scrollTopBtn = document.getElementById('scrollTopBtn');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 250) {
+        scrollTopBtn.classList.add('show');
+      } else {
+        scrollTopBtn.classList.remove('show');
+      }
+    });
+
+    scrollTopBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });</script><script type="module" src="scripts/views/app.js"></script></body></html>
