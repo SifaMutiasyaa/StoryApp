@@ -3,7 +3,7 @@ import '../styles/styles.css';
 import routes from './routes/routes';
 import UrlParser from './routes/url-parser';
 import Auth from './utils/auth';
-import { subscribe, unsubscribe } from './utils/notification-helper';
+import { subscribe, unsubscribe, NotificationHelper, ensureServiceWorkerExists } from './utils/notification-helper';
 
 let app = null;
 
@@ -58,10 +58,48 @@ const renderPage = async () => {
   updateAuthUI();
 };
 
-// 🧹 Hindari duplikasi DOMContentLoaded
-document.addEventListener('DOMContentLoaded', () => {
+const updateNotificationButtons = async () => {
+  const subscribeButton = document.querySelector('#subscribe-button');
+  const unsubscribeButton = document.querySelector('#unsubscribe-button');
+  
+  if (!subscribeButton || !unsubscribeButton) return;
+  
+  try {
+    const { isCurrentPushSubscriptionAvailable } = await import('./utils/notification-helper');
+    const isSubscribed = await isCurrentPushSubscriptionAvailable();
+    
+    subscribeButton.style.display = isSubscribed ? 'none' : 'inline-block';
+    unsubscribeButton.style.display = isSubscribed ? 'inline-block' : 'none';
+    
+    // Konsistensi pada teks dan icon
+    subscribeButton.innerHTML = '<i class="fas fa-bell"></i> Langganan';
+    unsubscribeButton.innerHTML = '<i class="fas fa-bell-slash"></i> Berhenti Langganan';
+  } catch (error) {
+    console.error('Error updating notification buttons:', error);
+  }
+};
+
+
+document.addEventListener('DOMContentLoaded', async () => {
   app = document.querySelector('#app');
   renderPage();
+
+  if ('serviceWorker' in navigator) {
+    try {
+      await ensureServiceWorkerExists();
+    
+      if (window.Notification && Notification.permission === 'granted') {
+        setTimeout(() => {
+          NotificationHelper.sendPushNotification(
+            'StoryApp siap digunakan!', 
+            { body: 'Aplikasi telah siap digunakan dalam mode offline' }
+          );
+        }, 1000);
+      }
+    } catch (error) {
+      console.error('Gagal memastikan Service Worker:', error);
+    }
+  }
 
   const logoutLink = document.querySelector('#logout-link');
   logoutLink?.addEventListener('click', () => {
@@ -71,12 +109,43 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   const subscribeButton = document.querySelector('#subscribe-button');
-  subscribeButton?.addEventListener('click', subscribe);
+  subscribeButton?.addEventListener('click', async () => {
+    if (subscribeButton.disabled) return;
+    
+    try {
+      subscribeButton.disabled = true;
+      subscribeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+      
+      await subscribe();
+ 
+      await updateNotificationButtons();
+    } catch (error) {
+      console.error('Error subscribing:', error);
+    } finally {
+      subscribeButton.disabled = false;
+      subscribeButton.innerHTML = '<i class="fas fa-bell"></i> Langganan';
+    }
+  });
 
   const unsubscribeButton = document.querySelector('#unsubscribe-button');
-  unsubscribeButton?.addEventListener('click', unsubscribe);
+  unsubscribeButton?.addEventListener('click', async () => {
+    if (unsubscribeButton.disabled) return;
+    
+    try {
+      unsubscribeButton.disabled = true;
+      unsubscribeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+      
+      await unsubscribe();
+      
+      await updateNotificationButtons();
+    } catch (error) {
+      console.error('Error unsubscribing:', error);
+    } finally {
+      unsubscribeButton.disabled = false;
+      unsubscribeButton.innerHTML = '<i class="fas fa-bell-slash"></i> Berhenti Langganan';
+    }
+  });
 
-  // ⬇️ Install PWA prompt event
   let deferredPrompt;
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
@@ -95,5 +164,4 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// ⬇️ Navigasi dinamis
 window.addEventListener('hashchange', renderPage);

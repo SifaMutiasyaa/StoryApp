@@ -1,4 +1,3 @@
-// utils/idb.js
 import { openDB } from 'idb';
 
 const DB_NAME = 'story-app-db';
@@ -13,7 +12,6 @@ const dbPromise = openDB(DB_NAME, DB_VERSION, {
   },
 });
 
-// Fungsi untuk generate fallback image base64
 const generateNoImageFallback = () => 
   'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMjAwIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2VlZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE4IiBmaWxsPSIjODg4Ij5ObyBJbWFnZTwvdGV4dD48L3N2Zz4=';
 

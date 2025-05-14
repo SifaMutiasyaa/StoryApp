@@ -1,11 +1,10 @@
-// app.js
 import 'regenerator-runtime';
 import '../styles/styles.css';
 import routes from '../routes/routes.js';
 import UrlParser from '../routes/url-parser.js';
 import Auth from '../utils/auth';
 import AddStoryPresenter from '../pages/add-story/add-story-presenter';
-import { subscribe, unsubscribe } from '../utils/notification-helper';
+import { subscribe, unsubscribe, ensureServiceWorkerExists } from '../utils/notification-helper';
 
 const app = {
   _currentPresenter: null,
@@ -119,7 +118,7 @@ function updateAuthUI() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   const logoutLink = document.querySelector('#logout-link');
   logoutLink?.addEventListener('click', () => {
     Auth.deleteToken();
@@ -127,21 +126,84 @@ document.addEventListener('DOMContentLoaded', () => {
     updateAuthUI();
   });
 
+  const updateNotificationButtons = async () => {
+    const subscribeButton = document.querySelector('#subscribe-button');
+    const unsubscribeButton = document.querySelector('#unsubscribe-button');
+    
+    if (!subscribeButton || !unsubscribeButton) return;
+    
+    try {
+      const { isCurrentPushSubscriptionAvailable } = await import('../utils/notification-helper');
+      const isSubscribed = await isCurrentPushSubscriptionAvailable();
+      
+      subscribeButton.style.display = isSubscribed ? 'none' : 'inline-block';
+      unsubscribeButton.style.display = isSubscribed ? 'inline-block' : 'none';
+  
+      subscribeButton.innerHTML = '<i class="fas fa-bell"></i> Langganan';
+      unsubscribeButton.innerHTML = '<i class="fas fa-bell-slash"></i> Berhenti Langganan';
+    } catch (error) {
+      console.error('Error updating notification buttons:', error);
+    }
+  };
+
+  await updateNotificationButtons();
+ 
+  let isProcessing = false;
+
   const subscribeButton = document.querySelector('#subscribe-button');
-  subscribeButton?.addEventListener('click', subscribe);
+  subscribeButton?.addEventListener('click', async () => {
+    if (isProcessing) return;
+    isProcessing = true;
+    
+    try {
+      await ensureServiceWorkerExists();
+      
+      if (subscribeButton) {
+        subscribeButton.disabled = true;
+        subscribeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+      }
+      
+      await subscribe();
+      
+      await updateNotificationButtons();
+    } catch (error) {
+      console.error('Error subscribing:', error);
+    } finally {
+      if (subscribeButton) {
+        subscribeButton.disabled = false;
+        subscribeButton.innerHTML = '<i class="fas fa-bell"></i> Langganan';
+      }
+      isProcessing = false;
+    }
+  });
 
   const unsubscribeButton = document.querySelector('#unsubscribe-button');
-  unsubscribeButton?.addEventListener('click', unsubscribe);
-});
-
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker
-      .register('/service-worker.js')
-      .then(() => console.log('Service Worker registered'))
-      .catch((err) => console.error('Service Worker registration failed:', err));
+  unsubscribeButton?.addEventListener('click', async () => {
+    if (isProcessing) return;
+    isProcessing = true;
+    
+    try {
+      await ensureServiceWorkerExists();
+      
+      if (unsubscribeButton) {
+        unsubscribeButton.disabled = true;
+        unsubscribeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+      }
+      
+      await unsubscribe();
+ 
+      await updateNotificationButtons();
+    } catch (error) {
+      console.error('Error unsubscribing:', error);
+    } finally {
+      if (unsubscribeButton) {
+        unsubscribeButton.disabled = false;
+        unsubscribeButton.innerHTML = '<i class="fas fa-bell-slash"></i> Berhenti Langganan';
+      }
+      isProcessing = false;
+    }
   });
-}
+});
 
 let deferredPrompt;
 

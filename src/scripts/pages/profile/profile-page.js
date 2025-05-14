@@ -182,15 +182,14 @@ export default class ProfilePage {
         <span class="badge">Active User</span>
         <p><strong>Email:</strong> ${user.email}</p>
         <div class="notif-buttons">
-        <button id="subscribe-button" class="notif-btn" title="Langganan Notifikasi" aria-label="Langganan">
-         🔔 Langganan
-        </button>
-        <button id="unsubscribe-button" class="notif-btn unsub" style="display:none;" title="Berhenti Langganan" aria-label="Berhenti Langganan">
-          🔕 Berhenti
-        </button>
+          <button id="subscribe-button" class="notif-btn notification-button" title="Langganan Notifikasi" aria-label="Langganan">
+            <i class="fas fa-bell"></i> Langganan
+          </button>
+          <button id="unsubscribe-button" class="notif-btn unsub notification-button" style="display:none;" title="Berhenti Langganan" aria-label="Berhenti Langganan">
+            <i class="fas fa-bell-slash"></i> Berhenti Langganan
+          </button>
         </div>
         <button id="logout-btn">Logout</button>
-
       </section>
     `;
   }
