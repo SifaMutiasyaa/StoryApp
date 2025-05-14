@@ -2,6 +2,8 @@
 
 Proyek ini adalah setup dasar untuk aplikasi web yang menggunakan webpack untuk proses bundling, Babel untuk transpile JavaScript, serta mendukung proses build dan serving aplikasi.
 
+link deploy aplikasi: https://bejewelled-starship-4ede27.netlify.app/
+
 ## Table of Contents
 
 - [Getting Started](#getting-started)
