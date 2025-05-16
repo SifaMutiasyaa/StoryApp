@@ -5,8 +5,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import IDBHelper from '../../utils/idb';
 
-// Fallback image base64 untuk offline
-const generateNoImageFallback = () => 
+const generateNoImageFallback = () =>
   'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMjAwIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2VlZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE4IiBmaWxsPSIjODg4Ij5ObyBJbWFnZTwvdGV4dD48L3N2Zz4=';
 
 export default class DetailStoryPresenter {
@@ -26,7 +25,6 @@ export default class DetailStoryPresenter {
     try {
       const { story } = await StoryApi.getStoryDetail({ id: storyId, token });
 
-      // Handle image
       let base64Image = generateNoImageFallback();
       if (story.photoUrl) {
         try {
@@ -52,39 +50,51 @@ export default class DetailStoryPresenter {
 
       container.innerHTML = `
         <h2>${story.name}</h2>
-        <p class="badge">📍 ${story.lat && story.lon ? 
-          `${story.lat.toFixed(5)}, ${story.lon.toFixed(5)}` : 
+        <p class="badge">📍 ${story.lat && story.lon ?
+          `${story.lat.toFixed(5)}, ${story.lon.toFixed(5)}` :
           'Tidak ada lokasi'}
         </p>
         <p class="badge">🕒 ${createdDate}</p>
         <p>${story.description}</p>
         <a href="#/" class="btn">← Kembali ke Beranda</a>
-        <button id="save-story-btn" class="btn">💾 Simpan untuk Offline</button>
+        <button id="toggle-offline-btn" class="btn"></button>
       `;
 
       if (story.lat && story.lon) {
         this.renderMap(story);
       } else {
-        document.getElementById('map').innerHTML = 
+        document.getElementById('map').innerHTML =
           '<p><em>Tidak ada data lokasi untuk cerita ini</em></p>';
       }
 
-      // Handle save to IndexedDB
-      document.getElementById('save-story-btn').addEventListener('click', async () => {
-        try {
-          const offlineStory = {
-            ...story,
-            offlineImage: base64Image,
-            createdAt: story.createdAt || new Date().toISOString()
-          };
+      // Handle toggle save/delete offline
+      const toggleBtn = document.getElementById('toggle-offline-btn');
 
-          await IDBHelper.saveStories([offlineStory]);
-          alert('Berhasil disimpan untuk offline!');
-        } catch (e) {
-          console.error('Gagal menyimpan:', e);
-          alert('Gagal menyimpan cerita offline');
+      const updateButtonState = async () => {
+        const existing = await IDBHelper.getStoryById(story.id);
+        if (existing) {
+          toggleBtn.textContent = '🗑️ Hapus dari Offline';
+          toggleBtn.onclick = async () => {
+            await IDBHelper.deleteStoryById(story.id);
+            alert('Cerita dihapus dari penyimpanan offline.');
+            updateButtonState(); // refresh tombol
+          };
+        } else {
+          toggleBtn.textContent = '💾 Simpan untuk Offline';
+          toggleBtn.onclick = async () => {
+            const offlineStory = {
+              ...story,
+              offlineImage: base64Image,
+              createdAt: story.createdAt || new Date().toISOString()
+            };
+            await IDBHelper.saveStories([offlineStory]);
+            alert('Cerita disimpan untuk offline!');
+            updateButtonState(); // refresh tombol
+          };
         }
-      });
+      };
+
+      await updateButtonState();
 
     } catch (err) {
       console.error('Error memuat cerita:', err);
@@ -97,8 +107,7 @@ export default class DetailStoryPresenter {
 
   renderMap(story) {
     const map = L.map('map').setView([story.lat, story.lon], 13);
-    
-    // Konfigurasi marker
+
     delete L.Icon.Default.prototype._getIconUrl;
     L.Icon.Default.mergeOptions({
       iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon-2x.png',
@@ -106,7 +115,6 @@ export default class DetailStoryPresenter {
       shadowUrl: 'https://unpkg.com/leaflet@1.9.3/dist/images/marker-shadow.png',
     });
 
-    // Layer peta
     const baseLayers = {
       "OpenStreetMap": L.tileLayer(
         'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -120,7 +128,6 @@ export default class DetailStoryPresenter {
 
     baseLayers["OpenStreetMap"].addTo(map);
 
-    // Tambahkan marker
     L.marker([story.lat, story.lon])
       .addTo(map)
       .bindPopup(`
@@ -129,7 +136,6 @@ export default class DetailStoryPresenter {
       `)
       .openPopup();
 
-    // Tambahkan layer control
     L.control.layers(baseLayers).addTo(map);
   }
 }

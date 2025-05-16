@@ -62,6 +62,16 @@ const IDBHelper = {
     await db.delete(STORE_NAME, id);
   },
 
+  async getStoryById(id) {
+    const db = await dbPromise;
+    return db.get(STORE_NAME, id);
+  },
+
+  async deleteStoryById(id) {
+    const db = await dbPromise;
+    await db.delete(STORE_NAME, id);
+  },
+
   convertBlobToBase64(blob) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
